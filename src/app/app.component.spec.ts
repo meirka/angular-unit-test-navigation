@@ -1,86 +1,70 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+
 import { AppComponent } from './app.component';
-import {RouterTestingModule} from "@angular/router/testing";
-import {PressReleaseComponent} from "./press-release/press-release.component";
-import {ScoreComponent} from "./score/score.component";
-import {BrowserModule} from "@angular/platform-browser";
-import {AppRoutingModule} from "./app-routing.module";
-import {Router, RouterModule} from "@angular/router";
+import { AppModule } from './app.module';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [
-        AppComponent,
-        PressReleaseComponent,
-        ScoreComponent
-      ],
-      imports: [
-        BrowserModule,
-        AppRoutingModule,
-        RouterModule,
-        RouterTestingModule,
-        RouterModule,
-      ]
-    }).compileComponents();
+    TestBed.configureTestingModule({
+      imports: [AppModule, RouterTestingModule],
+    });
 
+    fixture = TestBed.createComponent(AppComponent);
     const router = TestBed.inject(Router);
     router.initialNavigation();
+    fixture.autoDetectChanges(true);
   });
 
+  let fixture: ComponentFixture<AppComponent>;
+
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
 
   it('should render welcome', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.app-main')?.textContent).toContain('Navigation test');
+    expect(
+      fixture.debugElement.query(By.css('.app-main')).nativeElement.textContent
+    ).toContain('Navigation test');
   });
 
   it('has link to go to score', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.querySelector('.app-go-to-score')?.textContent).toContain('go to score');
+    expect(
+      fixture.debugElement.query(By.css('.app-go-to-score')).nativeElement
+        .textContent
+    ).toContain('go to score');
   });
 
   it('navigates to score', async () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    let querySelector = compiled.querySelector('.app-go-to-score') as HTMLElement;
-    querySelector?.click();
-
-    fixture.detectChanges();
+    fixture.debugElement
+      .query(By.css('.app-go-to-score'))
+      .triggerEventHandler('click', { button: 0 });
     await fixture.whenStable();
 
-    expect(compiled.querySelector('.app-score')?.textContent).toContain('score works!');
+    expect(
+      fixture.debugElement.query(By.css('.app-score')).nativeElement.textContent
+    ).toContain('score works!');
   });
 
   it('navigates to score and back', async () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    let gotoScore = compiled.querySelector('.app-go-to-score') as HTMLElement;
-    gotoScore.click();
-
-    fixture.detectChanges();
+    fixture.debugElement
+      .query(By.css('.app-go-to-score'))
+      .triggerEventHandler('click', { button: 0 });
     await fixture.whenStable();
 
-    let goBack = compiled.querySelector('.app-go-back') as HTMLElement;
-    goBack.click();
-
-    fixture.detectChanges();
+    fixture.ngZone?.run(() => {
+      fixture.debugElement
+        .query(By.css('.app-go-back'))
+        .triggerEventHandler('click', { button: 0 });
+    });
     await fixture.whenStable();
 
-    expect(compiled.querySelector('.app-release')?.textContent).toContain('press-release works!');
+    expect(
+      fixture.debugElement.query(By.css('.app-release')).nativeElement
+        .textContent
+    ).toContain('press-release works!');
   });
-
 });
