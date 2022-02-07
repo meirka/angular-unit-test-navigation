@@ -1,5 +1,7 @@
 import {By} from '@angular/platform-browser';
 import {RouterTestingModule} from '@angular/router/testing';
+import {TestBed} from '@angular/core/testing';
+import {Router} from '@angular/router';
 
 import {AppComponent} from './app.component';
 import {AppModule} from './app.module';
@@ -32,7 +34,9 @@ describe('AppComponent-TestingLibrary', () => {
 
   it('navigates to score and back', async () => {
     let subject = await render(AppComponent, {imports: [AppModule, RouterTestingModule]});
-    await subject.navigate('/');
+    
+    const router = TestBed.inject(Router);
+    router.initialNavigation();
 
     expect(await subject.findByText('press-release works!')).toBeTruthy();
 
